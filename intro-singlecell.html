@@ -239,6 +239,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="palmer-penguins" class="level2">
 <h2 class="anchored" data-anchor-id="palmer-penguins">Palmer penguins</h2>
 <p>In this section, we give an example of using <code>tidyverse</code> functions with the <code>palmerpenguins</code> dataset available as a CRAN package.</p>
+<div class="cell" data-layout-align="center" data-show="true" data-fig.caption="Palmer penguins">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/lter_penguins.png" class="img-fluid figure-img" width="780"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>[<strong>Source</strong>: <a href="https://github.com/allisonhorst/stats-illustrations">Artwork by Allison Horst</a>]</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins) <span class="co"># penguins!</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>({</span>
@@ -327,7 +337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(species, body_mass_g)) <span class="sc">+</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill=</span>species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -363,7 +373,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(species, body_mass_g)) <span class="sc">+</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill=</span>species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Let’s create a new matrix called <code>scaled</code> with just the four columns scaled.</p>
@@ -437,7 +447,7 @@ body_mass_g        0.5496747 -0.07646366  0.5917374  0.5846861</code></pre>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">color=</span>species)) <span class="sc">+</span> </span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -633,7 +643,7 @@ mt-Nd4l         mito</code></pre>
 <span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab=</span><span class="st">"Variance of log-expression"</span>)</span>
 <span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(fit.retina<span class="sc">$</span><span class="fu">trend</span>(x), <span class="at">col=</span><span class="st">"dodgerblue"</span>, <span class="at">add=</span><span class="cn">TRUE</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -651,7 +661,7 @@ mt-Nd4l         mito</code></pre>
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization of PC1 vs PC2</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotPCA</span>(sce, <span class="at">colour_by=</span><span class="st">"label"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -661,7 +671,7 @@ mt-Nd4l         mito</code></pre>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">UMAP plot of the retina dataset, where each point is a cell and is colored by the assigned cluster identity.</figcaption>
 </figure>
 </div>
@@ -678,7 +688,7 @@ mt-Nd4l         mito</code></pre>
 </section>
 <section id="part-4" class="level1">
 <h1>Part 4</h1>
-<p>Last, we will briefly highlight the <code>tidySingleCellExperiment</code> package (<a href="https://stemangiola.github.io/tidySingleCellExperiment" class="uri">https://stemangiola.github.io/tidySingleCellExperiment</a>) that allows you to leverage functions from <code>dplyr</code>, <code>tidyr</code>, and <code>ggplot2</code> with a <code>SingleCellExperiment</code> object.</p>
+<p>Last, we will briefly highlight the <code>tidySingleCellExperiment</code> package (<a href="https://www.bioconductor.org/packages/SingleCellExperiment" class="uri">https://www.bioconductor.org/packages/SingleCellExperiment</a>) that allows you to leverage functions from <code>dplyr</code>, <code>tidyr</code>, and <code>ggplot2</code> with a <code>SingleCellExperiment</code> object.</p>
 <p>This package is part of a large set of packages called <code>tidyomics</code>, which bridges the two worlds of tidy principles in R with Bioconductor.</p>
 <p>It is similar to <code>tidyverse</code> in that it installs a series of packages that are designed to work with different types of objects in Bioconductor. Specifically, it installs:</p>
 <ul>
@@ -765,7 +775,7 @@ p1_ATTCTTGTTCTT              1.96078       816</code></pre>
 <span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotPCA</span>(retina_pca, <span class="at">colour_by=</span><span class="st">"label"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+<p><img src="intro-singlecell_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
