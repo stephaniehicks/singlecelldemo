@@ -38,12 +38,8 @@ We will go through the slides available here:
 In this section, we give an example of using `tidyverse` functions with the 
 `palmerpenguins` dataset available as a CRAN package. 
 
-```{r}
-#| echo: false
-#| fig-cap: "Palmer penguins"
-#| out-width: '60%'
-#| fig-align: 'center'
-knitr::include_graphics("https://allisonhorst.github.io/palmerpenguins/reference/figures/lter_penguins.png")
+```{r, out.width = "780px", show=TRUE, fig.align="center", fig.caption = "Palmer penguins", echo=FALSE}
+knitr::include_graphics("figures/lter_penguins.png")
 ```
 
 \[**Source**: [Artwork by Allison Horst](https://github.com/allisonhorst/stats-illustrations)\]
