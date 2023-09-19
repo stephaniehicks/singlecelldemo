@@ -1,0 +1,48 @@
+---
+title: "Code from slides"
+editor: visual
+---
+
+```{r}
+library(GenomicRanges)
+library(plyranges)
+gr <- GRanges(seqnames = "chr1", 
+              strand = c("+", "-"), 
+              ranges = IRanges(start = c(102012, 520211), 
+                               end = c(120303, 526211)),
+              gene_id = c(1001, 2151), 
+              score = c(10, 25))
+gr
+```
+
+```{r}
+width(gr)
+gr[gr$score > 15, ]
+```
+
+```{r}
+gr |> 
+  filter(score > 15)
+
+gr |> 
+  filter(score > 15) |> 
+  width()
+```
+
+```{r}
+library(plyranges)
+gr <- 
+  data.frame(seqnames = sample(c("chr1", "chr2"), 7, replace = TRUE),
+             strand = sample(c("+", "-"), 7, replace = TRUE),
+             score = runif(7),
+             start = 1:7,
+             width = 10) %>%
+  as_granges()
+gr
+```
+
+```{r}
+gr %>%
+  group_by(strand) %>% 
+  summarize(mean_score = mean(score))
+```

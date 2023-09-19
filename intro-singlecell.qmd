@@ -1,0 +1,378 @@
+---
+title: "Introduction to single cell data science"
+format:
+  html:
+    toc: true
+---
+
+
+
+# Part 1
+
+## Learning objectives
+
+1. Learn what are genomic data and how are they generated? 
+2. What is a `GRanges` object? 
+3. What are some advantages of applying tidy principles to genomic data? 
+4. What is a `SingleCellExperiment` object? 
+
+## Materials 
+
+We will go through the slides available here: 
+
+- <https://docs.google.com/presentation/d/1VFL4OxK44Q7b1c-Vk9PDnroT-R5_aQP2LRfJaHXQedo/edit?usp=sharing>
+
+
+
+
+# Part 2
+
+## Learning objectives 
+
+1. Remind ourselves of basics of `tidyverse` functions (mostly `dplyr` and `ggplot2`). 
+2. Introduce how to preprocess data and to perform principal components analysis (PCA), a widely used method for dimensionality reduction. 
+
+
+## Palmer penguins
+
+In this section, we give an example of using `tidyverse` functions with the 
+`palmerpenguins` dataset available as a CRAN package. 
+
+```{r}
+library(palmerpenguins) # penguins!
+suppressPackageStartupMessages({
+  library(ggplot2) # "grammar of graphics" plots
+  library(dplyr) # data pliers
+})
+```
+
+We can select first three rows and two columns: 
+
+```{r}
+penguins |> 
+  slice(1:3) |>
+  select(species, island) 
+```
+
+And estimate the average body mass in grams using `summarize()`: 
+
+```{r}
+penguins |> 
+  summarize(ave_mass = mean(body_mass_g, na.rm=TRUE))
+```
+Rearranging how we omit NA values, we get the same: 
+
+```{r}
+penguins |> 
+  na.omit() |> 
+  summarize(ave_mass = mean(body_mass_g))
+```
+
+Or we can also drop NA values entirely and modify our original dataset
+
+```{r}
+penguins <- penguins |> 
+  na.omit()
+
+penguins |> 
+  summarize(ave_mass = mean(body_mass_g))
+```
+
+A powerful paradigm is to first group and then summarize: 
+
+```{r}
+penguins |> 
+  group_by(species, island) |> 
+  summarize(ave_mass = mean(body_mass_g))
+```
+
+## Visualization 
+
+These data can also be piped into functions for data visualization: 
+
+```{r}
+penguins |> 
+  ggplot(aes(species, body_mass_g)) +
+  geom_boxplot(aes(fill=species))
+```
+
+## Dimensionality reduction 
+
+Next, we will work towards using dimensionality reduction to visualize the 
+penguins in the principal components space. 
+
+For the four columns that contain `mm` or `mass`, we apply `scale()`, which 
+centers and scales each variable. 
+
+```{r}
+penguins |> 
+  mutate(across(contains(c("mm","mass")), scale))
+```
+
+Visualizing the scaled data (i.e. y-axis has changed, but distribution is the same). 
+
+```{r}
+penguins |> 
+  mutate(across(contains(c("mm","mass")), scale)) |> 
+  ggplot(aes(species, body_mass_g)) +
+  geom_boxplot(aes(fill=species))
+```
+
+Let's create a new matrix called `scaled` with just the four columns scaled. 
+
+```{r}
+scaled <- penguins |> 
+  select(contains(c("mm","mass"))) |> 
+  mutate(across(everything(), scale))
+scaled
+```
+
+Then, we can apply the function `prcomp()` to calculate the principal components 1 to 4. 
+
+Under the hood, the function uses a singular value decomposition of the centered and scaled data matrix (not using `eigen` on the covariance matrix). Often preferred for numerical accuracy. 
+
+```{r}
+scaled |> 
+  prcomp() 
+```
+
+Some useful things about output: 
+
+```{r}
+pca <- scaled |> 
+  prcomp()
+
+names(pca)
+dim(pca$x)
+head(pca$x)
+```
+
+Visualize 
+```{r}
+penguins |> 
+  bind_cols(pca$x) |> 
+  ggplot(aes(PC1, PC2, color=species)) + 
+  geom_point()
+```
+
+# Part 3 
+
+In this next section, we move into the analysis of single-cell transcriptomics data with a goal of learning the basic steps for data wrangling these data to calculate top principal components where each point is a _cell_ (instead of a _penguin_). 
+
+## Learning objectives 
+
+1. Be able to create a single-cell count matrix and read it into R
+2. Recognize and define the `SingleCellExperiment` S4 class in R/Bioconductor to store single-cell data
+3. Be able to describe a standard workflow for analyzing single-cell data
+4. Be able to run code for a standard workflow starting from loading a `SingleCellExperiment` in R and identifying clusters.
+
+
+## Overview 
+
+NGS data from scRNA-seq experiments must be converted into a matrix of expression values. 
+
+This is **usually a count matrix** containing the number of reads (or UMIs) mapped to each gene (row) in each cell (column).
+Once this quantification is complete, we can proceed with our downstream statistical analyses in R.
+
+Constructing a count matrix from raw scRNA-seq data requires some thought as the term "single-cell RNA-seq" encompasses a variety of different experimental protocols. 
+
+
+## `SingleCellExperiment` Class
+
+One of the **main strengths** of the Bioconductor project lies in the use of **a common data infrastructure** that powers interoperability across packages. 
+
+Users should be able to analyze their data using functions from different Bioconductor packages without the need to convert between formats. 
+
+To this end, the `SingleCellExperiment` class (from the `SingleCellExperiment` package) serves as the common currency for data exchange across 70+ single-cell-related Bioconductor packages. 
+
+This class implements a data structure that stores all aspects of our single-cell data - gene-by-cell expression data, per-cell metadata and per-gene annotation - and manipulate them in a synchronized manner.
+
+```{r, out.width = "780px", show=TRUE, fig.align="center", fig.caption = "Overview of the structure of the `SingleCellExperiment` class. Each row of the assays corresponds to a row of the `rowData` (pink shading), while each column of the assays corresponds to a column of the `colData` and `reducedDims` (yellow shading).", echo=FALSE}
+knitr::include_graphics("figures/SingleCellExperiment.png")
+```
+
+[[source](https://doi.org/10.1101/590562)]
+
+
+- Each piece of (meta)data in the `SingleCellExperiment` is **represented by a separate "slot"**.
+
+(This terminology comes from the S4 class system, but that’s not important right now). 
+
+If we imagine the `SingleCellExperiment` object to be a cargo ship, the **slots can be thought of as individual cargo boxes with different contents**, e.g., certain slots expect numeric matrices whereas others may expect data frames. 
+
+If you want to know more about the available slots, their expected formats, and how we can interact with them, check out this [chapter](https://bioconductor.org/books/3.15/OSCA.intro/the-singlecellexperiment-class.html). 
+
+
+### `SingleCellExperiment` Example
+
+Let's show you what a `SingleCellExperiment` (or `sce` for short) looks like. 
+
+```{r, message=FALSE, echo=FALSE}
+library(scRNAseq)
+sce <- ZeiselBrainData()
+```
+
+```{r}
+sce
+```
+
+This `SingleCellExperiment` object has `r nrow(sce)` genes and `r ncol(sce)` cells.
+
+We can pull out the counts matrix with the `counts()` function and the corresponding `rowData()` and `colData()`: 
+
+```{r}
+counts(sce)[1:5, 1:5]
+rowData(sce)
+colData(sce)
+```
+
+
+
+
+## A typical single-cell workflow
+
+Here, we provide an overview of the framework of a typical scRNA-seq analysis workflow:  
+
+```{r, out.width = "780px", show=TRUE, fig.align="center", fig.caption = "Schematic of a typical scRNA-seq analysis workflow. Each stage (separated by dashed lines) consists of a number of specific steps, many of which operate on and modify a SingleCellExperiment instance.", echo=FALSE}
+knitr::include_graphics("figures/workflow.png")
+```
+
+
+In the simplest case, the workflow has the following form:
+
+1. We compute **quality control metrics** to remove low-quality cells that would interfere with downstream analyses. These cells may have been damaged during processing or may not have been fully captured by the sequencing protocol. Common metrics includes the total counts per cell, the proportion of spike-in or mitochondrial reads and the number of detected features.
+2. We convert the counts into **normalized expression values** to eliminate cell-specific biases (e.g., in capture efficiency). This allows us to perform explicit comparisons across cells in downstream steps like clustering. We also apply a transformation, typically log, to adjust for the mean-variance relationship.
+3. We perform **feature selection to pick a subset of interesting features** for downstream analysis. This is done by modelling the variance across cells for each gene and retaining genes that are highly variable. The aim is to reduce computational overhead and noise from uninteresting genes.
+4. We apply **dimensionality reduction to compact the data** and further reduce noise. Principal components analysis is typically used to obtain an initial low-rank representation for more computational work, followed by more aggressive methods like $t$-stochastic neighbor embedding for visualization purposes.
+5. We **cluster cells into groups** according to similarities in their (normalized) expression profiles. This aims to obtain groupings that serve as empirical proxies for distinct biological states. We typically interpret these groupings by identifying differentially expressed marker genes between clusters.
+
+## Quick start (simple)
+
+Here, we use the a droplet-based retina dataset from Macosko et al. (2015), provided in the `scRNAseq` package. 
+This starts from a count matrix and finishes with clusters in preparation for biological interpretation. 
+We also demonstrate how to identify differentially expressed genes between the clusters. 
+
+```{r}
+library(scRNAseq)
+sce <- MacoskoRetinaData()
+
+# Quality control (using mitochondrial genes).
+library(scater)
+is.mito <- grepl("^MT-", rownames(sce)) # find mitochondrial genes
+qcstats <- perCellQCMetrics(sce, subsets=list(Mito=is.mito)) # calculate QC metrics 
+filtered <- quickPerCellQC(qcstats, percent_subsets="subsets_Mito_percent") # filter base on QC metrics
+sce <- sce[, !filtered$discard] # subset object for post-QC analyses
+
+# Normalization.
+sce <- logNormCounts(sce)
+
+# Feature selection (which genes are most important)? 
+library(scran)
+dec.retina <- modelGeneVar(sce)
+hvg <- getTopHVGs(dec.retina, prop=0.1)
+
+# Visualizing the fit:
+fit.retina <- metadata(dec.retina)
+plot(fit.retina$mean, fit.retina$var, xlab="Mean of log-expression",
+    ylab="Variance of log-expression")
+curve(fit.retina$trend(x), col="dodgerblue", add=TRUE, lwd=2)
+```
+
+```{r}
+# PCA
+library(scater)
+set.seed(1234)
+sce <- runPCA(sce, ncomponents=25, subset_row=hvg)
+
+# Clustering.
+library(bluster)
+colLabels(sce) <- clusterCells(sce, use.dimred='PCA',
+    BLUSPARAM=NNGraphParam(cluster.fun="louvain"))  
+```
+
+```{r}
+# Visualization of PC1 vs PC2
+plotPCA(sce, colour_by="label")
+```
+
+```{r, fig.cap="UMAP plot of the retina dataset, where each point is a cell and is colored by the assigned cluster identity."}
+# UMAP visualization 
+sce <- runUMAP(sce, dimred = 'PCA')
+plotUMAP(sce, colour_by="label")
+```
+
+## For more information
+
+If you could like to know more, check out this book:
+
+- <https://bioconductor.org/books/release/OSCA/>
+
+
+# Part 4
+
+Last, we will briefly highlight the `tidySingleCellExperiment` package (<https://stemangiola.github.io/tidySingleCellExperiment>) that allows you to leverage functions from `dplyr`, `tidyr`, and `ggplot2` with a `SingleCellExperiment` object. 
+
+This package is part of a large set of packages called `tidyomics`, which bridges the two worlds of tidy principles in R with Bioconductor. 
+
+It is similar to `tidyverse` in that it installs a series of packages that are designed to work with different types of objects in Bioconductor. 
+Specifically, it installs: 
+
+- `plyranges` = for data with `GRanges`
+- `tidybulk` = for bulk RNA-sequencing data 
+- `tidySummarizedExperiment` = for data in a `SummarizedExperiment` object
+- `tidySingleCellExperiment` = for data in a `SingleCellExperiment` object
+- `tidySpatialExperiment` = for data in a `SpatialExperiment` object
+- `tidyseurat` = to bring Seurat to the tidyverse 
+- `nullranges` = to generate of sets of `GRranges` representing the null hypothesis
+
+
+For more information: 
+
+- manuscript: <https://doi.org/10.1101/2023.09.10.557072>
+- to install `tidyomics`: <https://github.com/tidyomics/tidyomics>
+
+``` r 
+remotes::install_github("tidyomics/tidyomics")
+```
+
+
+## Overview 
+```{r}
+suppressPackageStartupMessages({
+  library(tidySummarizedExperiment) # allow dplyr
+})
+```
+
+```{r}
+sce |>
+  addPerCellQC(subsets=list(Mito=is.mito)) |>
+  colData()
+```
+
+```{r}
+# Identify variable genes with scran
+variable_genes <-
+    sce %>%
+    modelGeneVar() %>%
+    getTopHVGs(prop=0.1)
+```
+
+```{r}
+# Perform PCA with scater
+retina_pca <-
+    sce %>%
+    runPCA(subset_row=variable_genes)
+
+plotPCA(retina_pca, colour_by="label")
+```
+
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+
+
+
