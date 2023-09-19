@@ -39,6 +39,17 @@ In this section, we give an example of using `tidyverse` functions with the
 `palmerpenguins` dataset available as a CRAN package. 
 
 ```{r}
+#| echo: false
+#| fig-cap: "Palmer penguins"
+#| out-width: '60%'
+#| fig-align: 'center'
+knitr::include_graphics("https://allisonhorst.github.io/palmerpenguins/reference/figures/lter_penguins.png")
+```
+
+\[**Source**: [Artwork by Allison Horst](https://github.com/allisonhorst/stats-illustrations)\]
+
+
+```{r}
 library(palmerpenguins) # penguins!
 suppressPackageStartupMessages({
   library(ggplot2) # "grammar of graphics" plots
@@ -310,7 +321,7 @@ If you could like to know more, check out this book:
 
 # Part 4
 
-Last, we will briefly highlight the `tidySingleCellExperiment` package (<https://stemangiola.github.io/tidySingleCellExperiment>) that allows you to leverage functions from `dplyr`, `tidyr`, and `ggplot2` with a `SingleCellExperiment` object. 
+Last, we will briefly highlight the `tidySingleCellExperiment` package (<https://www.bioconductor.org/packages/SingleCellExperiment>) that allows you to leverage functions from `dplyr`, `tidyr`, and `ggplot2` with a `SingleCellExperiment` object. 
 
 This package is part of a large set of packages called `tidyomics`, which bridges the two worlds of tidy principles in R with Bioconductor. 
 
